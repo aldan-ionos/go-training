@@ -4,9 +4,10 @@ import (
 	"flag"
 	"os"
 
+	"log"
+
 	"github.com/aldan-ionos/go-training/client"
 	"github.com/aldan-ionos/go-training/server"
-	"github.com/prometheus/common/log"
 )
 
 func main() {
@@ -25,13 +26,13 @@ func main() {
 
 	switch {
 	case startServer:
-		log.Info("Starting gRPC server.")
+		log.Println("Starting gRPC server.")
 		server.StartServer(serverProtocol, port)
 	case startClient:
-		log.Info("Starting gRPC client.")
+		log.Println("Starting gRPC client.")
 		client.StartClient(port)
 	default:
-		log.Error("Neither the \"-start-server\" nor the \"-start-client\" flags were set.")
+		log.Fatalln("Neither the \"-start-server\" nor the \"-start-client\" flags were set.")
 		os.Exit(1)
 	}
 
