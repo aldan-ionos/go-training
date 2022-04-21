@@ -13,7 +13,7 @@ type Message struct {
 	newFile      *os.File
 
 	messageChan chan []byte
-	waitGroup   sync.WaitGroup
+	WaitGroup   sync.WaitGroup
 }
 
 func NewMessage() *Message {
@@ -38,7 +38,7 @@ func (m *Message) MoveToNewLocation() error {
 }
 
 func (m *Message) ReadOriginalFile() {
-	defer m.waitGroup.Done()
+	defer m.WaitGroup.Done()
 
 	scanner := bufio.NewScanner(m.originalFile)
 
@@ -57,24 +57,9 @@ func (m *Message) ReadOriginalFile() {
 
 }
 
-func (m *Message) SaveNewLineToFile() {
-	defer m.waitGroup.Done()
-
-	for {
-		select {
-		case newLine, ok := <-m.messageChan:
-			if ok {
-				_, err := m.newFile.Write(newLine)
-				if err != nil {
-					log.Fatalf("Failed to write line to new file:\n\t- %s", err.Error())
-					return
-				}
-			} else {
-				return
-			}
-		}
-	}
-
+func (m *Message) SaveNewLineToFile(newLine []byte) error {
+	_, err := m.newFile.Write(newLine)
+	return err
 }
 
 func (m *Message) OpenFile(filename string) error {
@@ -102,48 +87,9 @@ func (m *Message) CloseFiles() {
 func (m *Message) GetNextLine(ctx context.Context, line *Line) (*Line, error) {
 	newLine, ok := <-m.messageChan
 	if ok {
-		_, err := m.newFile.Write(newLine)
-		if err != nil {
-			log.Fatalf("Failed to write line to new file:\n\t- %s", err.Error())
-			return nil, err
-		}
+		return &Line{NextLine: newLine}, nil
 	}
+
 	return nil, nil
 
 }
-
-// func main() {
-
-// 	var (
-// 		m   = NewMessage()
-// 		err error
-// 	)
-
-// 	// Read original file
-// 	err = m.OpenFile("crimeandpunishment.txt")
-// 	if err != nil {
-// 		log.Fatalf("Failed to open originalFile:\n\t- %s", err.Error())
-// 	}
-
-// 	// Open New File
-// 	err = m.CreateFile("newfile.txt")
-// 	if err != nil {
-// 		log.Fatalf("Failed to craete newFile:\n\t- %s", err.Error())
-// 	}
-
-// 	// err = m.MoveToNewLocation()
-// 	// if err != nil {
-// 	// 	log.Fatalf("Failed to move content from one file to another:\n\t- %s", err.Error())
-// 	// }
-
-// 	m.waitGroup.Add(1)
-// 	go m.ReadOriginalFile()
-
-// 	m.waitGroup.Add(1)
-// 	m.SaveNewLineToFile()
-
-// 	m.waitGroup.Wait()
-
-// 	// Close files
-// 	m.CloseFiles()
-// }
