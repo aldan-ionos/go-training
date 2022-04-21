@@ -1,0 +1,12 @@
+syntax = "proto3";
+//package "message";
+
+option go_package="./message";
+
+service MessageService{
+    rpc GetNextLine(Line) returns(Line);
+}
+
+message Line {
+    bytes NextLine = 1;
+}
