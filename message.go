@@ -12,7 +12,9 @@ const (
 	WRITE
 )
 
-func moveToNewLocation(originalFile, newFile *os.File) error {
+type Message struct{}
+
+func (m Message) MoveToNewLocation(originalFile, newFile *os.File) error {
 	scanner := bufio.NewScanner(originalFile)
 
 	for scanner.Scan() {
@@ -26,7 +28,7 @@ func moveToNewLocation(originalFile, newFile *os.File) error {
 	return nil
 }
 
-func openFile(filename string, option int) (*os.File, error) {
+func (m Message) OpenFile(filename string, option int) (*os.File, error) {
 	var (
 		file *os.File
 		err  error
@@ -50,18 +52,19 @@ func openFile(filename string, option int) (*os.File, error) {
 
 func main() {
 	// Read original file
-	originalFile, err := openFile("crimeandpunishment.txt", READ)
+	m := Message{}
+	originalFile, err := m.OpenFile("crimeandpunishment.txt", READ)
 	if err != nil {
 		log.Fatalf("Failed to open originalFile:\n\t- %s", err.Error())
 	}
 
 	// Open New File
-	newFile, err := openFile("newfile.txt", WRITE)
+	newFile, err := m.OpenFile("newfile.txt", WRITE)
 	if err != nil {
 		log.Fatalf("Failed to craete newFile:\n\t- %s", err.Error())
 	}
 
-	err = moveToNewLocation(originalFile, newFile)
+	err = m.MoveToNewLocation(originalFile, newFile)
 	if err != nil {
 		log.Fatalf("Failed to move content from one file to another:\n\t- %s", err.Error())
 	}
