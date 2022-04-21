@@ -10,9 +10,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-type Server struct{}
-
-func (s Server) StartServer(protocol string, port int) {
+func StartServer(protocol string, port int) {
 	listener, err := net.Listen(protocol, fmt.Sprintf(":%d", port))
 	if err != nil {
 		log.Fatalf("Failed to listen on port %d.\n\t- %s", port, err.Error())
@@ -40,5 +38,5 @@ func (s Server) StartServer(protocol string, port int) {
 
 	messageServer.WaitGroup.Wait()
 
-	messageServer.CloseFiles()
+	// messageServer.CloseFiles()
 }

@@ -11,9 +11,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-type Client struct{}
-
-func (c *Client) SaveNewLineToFile(messageClient message.MessageServiceClient, filename string) error {
+func SaveNewLineToFile(messageClient message.MessageServiceClient, filename string) error {
 	m := message.NewMessage()
 	err := m.CreateFile(filename)
 	if err != nil {
@@ -42,7 +40,7 @@ func (c *Client) SaveNewLineToFile(messageClient message.MessageServiceClient, f
 
 }
 
-func (c *Client) StartClient(port int) {
+func StartClient(port int) {
 	var (
 		conn *grpc.ClientConn
 		err  error
@@ -57,7 +55,7 @@ func (c *Client) StartClient(port int) {
 	}
 
 	messageClient := message.NewMessageServiceClient(conn)
-	if err = c.SaveNewLineToFile(messageClient, "crimeandpunishment.txt"); err != nil {
+	if err = SaveNewLineToFile(messageClient, "crimeandpunishment.txt"); err != nil {
 		log.Fatalf("Failed to save next line to file.\n\t- %s", err.Error())
 		os.Exit(1)
 	}
