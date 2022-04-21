@@ -1,7 +1,7 @@
 syntax = "proto3";
 //package "message";
 
-option go_package="./message";
+option go_package="github.com/aldan-ionos/go-training/protos/message";
 
 service MessageService{
     rpc GetNextLine(Line) returns(Line);
