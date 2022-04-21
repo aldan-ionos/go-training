@@ -2,23 +2,20 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os"
 )
 
-const (
-	READ = iota
-	WRITE
-)
+type Message struct {
+	originalFile *os.File
+	newFile      *os.File
+}
 
-type Message struct{}
-
-func (m Message) MoveToNewLocation(originalFile, newFile *os.File) error {
-	scanner := bufio.NewScanner(originalFile)
+func (m *Message) MoveToNewLocation() error {
+	scanner := bufio.NewScanner(m.originalFile)
 
 	for scanner.Scan() {
-		newFile.Write(append(scanner.Bytes(), []byte("\n")...))
+		m.newFile.Write(append(scanner.Bytes(), []byte("\n")...))
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -28,48 +25,52 @@ func (m Message) MoveToNewLocation(originalFile, newFile *os.File) error {
 	return nil
 }
 
-func (m Message) OpenFile(filename string, option int) (*os.File, error) {
-	var (
-		file *os.File
-		err  error
-	)
+func (m *Message) OpenFile(filename string) error {
+	var err error
 
-	switch option {
-	case READ:
-		file, err = os.Open(filename)
-	case WRITE:
-		file, err = os.Create(filename)
-	default:
-		err = fmt.Errorf("unknown option %d. Expected either %d or %d", option, READ, WRITE)
-		return nil, err
-	}
-	if err != nil {
-		return nil, err
-	}
+	m.originalFile, err = os.Open(filename)
+	return err
+}
 
-	return file, nil
+func (m *Message) CreateFile(filename string) error {
+	var err error
+	m.newFile, err = os.Create(filename)
+	return err
+}
+
+func (m *Message) GetFiles() (*os.File, *os.File) {
+	return m.originalFile, m.newFile
+}
+
+func (m *Message) CloseFiles() {
+	m.originalFile.Close()
+	m.newFile.Close()
 }
 
 func main() {
+
+	var (
+		m   = Message{}
+		err error
+	)
+
 	// Read original file
-	m := Message{}
-	originalFile, err := m.OpenFile("crimeandpunishment.txt", READ)
+	err = m.OpenFile("crimeandpunishment.txt")
 	if err != nil {
 		log.Fatalf("Failed to open originalFile:\n\t- %s", err.Error())
 	}
 
 	// Open New File
-	newFile, err := m.OpenFile("newfile.txt", WRITE)
+	err = m.CreateFile("newfile.txt")
 	if err != nil {
 		log.Fatalf("Failed to craete newFile:\n\t- %s", err.Error())
 	}
 
-	err = m.MoveToNewLocation(originalFile, newFile)
+	err = m.MoveToNewLocation()
 	if err != nil {
 		log.Fatalf("Failed to move content from one file to another:\n\t- %s", err.Error())
 	}
 
 	// Close files
-	defer originalFile.Close()
-	defer newFile.Close()
+	m.CloseFiles()
 }
