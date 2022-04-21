@@ -1,7 +1,8 @@
-package main
+package message
 
 import (
 	"bufio"
+	context "context"
 	"log"
 	"os"
 	sync "sync"
@@ -98,42 +99,51 @@ func (m *Message) CloseFiles() {
 	m.newFile.Close()
 }
 
-// func (m *Message) GetNextLine(ctx context.Context, line *Line) (*Line, error) {
-// 	return line, nil
-// }
-
-func main() {
-
-	var (
-		m   = NewMessage()
-		err error
-	)
-
-	// Read original file
-	err = m.OpenFile("crimeandpunishment.txt")
-	if err != nil {
-		log.Fatalf("Failed to open originalFile:\n\t- %s", err.Error())
+func (m *Message) GetNextLine(ctx context.Context, line *Line) (*Line, error) {
+	newLine, ok := <-m.messageChan
+	if ok {
+		_, err := m.newFile.Write(newLine)
+		if err != nil {
+			log.Fatalf("Failed to write line to new file:\n\t- %s", err.Error())
+			return nil, err
+		}
 	}
+	return nil, nil
 
-	// Open New File
-	err = m.CreateFile("newfile.txt")
-	if err != nil {
-		log.Fatalf("Failed to craete newFile:\n\t- %s", err.Error())
-	}
-
-	// err = m.MoveToNewLocation()
-	// if err != nil {
-	// 	log.Fatalf("Failed to move content from one file to another:\n\t- %s", err.Error())
-	// }
-
-	m.waitGroup.Add(1)
-	go m.ReadOriginalFile()
-
-	m.waitGroup.Add(1)
-	m.SaveNewLineToFile()
-
-	m.waitGroup.Wait()
-
-	// Close files
-	m.CloseFiles()
 }
+
+// func main() {
+
+// 	var (
+// 		m   = NewMessage()
+// 		err error
+// 	)
+
+// 	// Read original file
+// 	err = m.OpenFile("crimeandpunishment.txt")
+// 	if err != nil {
+// 		log.Fatalf("Failed to open originalFile:\n\t- %s", err.Error())
+// 	}
+
+// 	// Open New File
+// 	err = m.CreateFile("newfile.txt")
+// 	if err != nil {
+// 		log.Fatalf("Failed to craete newFile:\n\t- %s", err.Error())
+// 	}
+
+// 	// err = m.MoveToNewLocation()
+// 	// if err != nil {
+// 	// 	log.Fatalf("Failed to move content from one file to another:\n\t- %s", err.Error())
+// 	// }
+
+// 	m.waitGroup.Add(1)
+// 	go m.ReadOriginalFile()
+
+// 	m.waitGroup.Add(1)
+// 	m.SaveNewLineToFile()
+
+// 	m.waitGroup.Wait()
+
+// 	// Close files
+// 	m.CloseFiles()
+// }
