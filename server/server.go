@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func StartServer(protocol string, port int) {
+func StartServer(protocol string, port int, filePath string) {
 	listener, err := net.Listen(protocol, fmt.Sprintf(":%d", port))
 	if err != nil {
 		log.Fatalf("Failed to listen on port %d.\n\t- %s", port, err.Error())
@@ -21,7 +21,7 @@ func StartServer(protocol string, port int) {
 	messageServer := message.NewMessage()
 
 	// Read original file
-	err = messageServer.OpenFile("crimeandpunishment.txt")
+	err = messageServer.OpenFile(filePath)
 	if err != nil {
 		log.Fatalf("Failed to open originalFile:\n\t- %s", err.Error())
 		os.Exit(1)

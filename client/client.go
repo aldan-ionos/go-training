@@ -11,9 +11,9 @@ import (
 	"google.golang.org/grpc"
 )
 
-func SaveNewLineToFile(messageClient message.MessageServiceClient, filename string) error {
+func SaveNewLineToFile(messageClient message.MessageServiceClient, filePath string) error {
 	m := message.NewMessage()
-	err := m.CreateFile(filename)
+	err := m.CreateFile(filePath)
 	if err != nil {
 		return err
 	}
@@ -24,7 +24,7 @@ func SaveNewLineToFile(messageClient message.MessageServiceClient, filename stri
 			m.CloseFiles()
 			return nil
 		default:
-			nextLine, err := messageClient.GetNextLine(context.Background(), nil)
+			nextLine, err := messageClient.GetNextLine(context.Background(), &message.Line{})
 			if err != nil {
 				return err
 			}
@@ -40,7 +40,7 @@ func SaveNewLineToFile(messageClient message.MessageServiceClient, filename stri
 
 }
 
-func StartClient(port int) {
+func StartClient(port int, filePath string) {
 	var (
 		conn *grpc.ClientConn
 		err  error
@@ -55,7 +55,7 @@ func StartClient(port int) {
 	}
 
 	messageClient := message.NewMessageServiceClient(conn)
-	if err = SaveNewLineToFile(messageClient, "crimeandpunishment.txt"); err != nil {
+	if err = SaveNewLineToFile(messageClient, filePath); err != nil {
 		log.Fatalf("Failed to save next line to file.\n\t- %s", err.Error())
 		os.Exit(1)
 	}
