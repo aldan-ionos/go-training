@@ -29,6 +29,11 @@ func SaveNewLineToFile(messageClient message.MessageServiceClient, filePath stri
 				return err
 			}
 
+			if len(nextLine.NextLine) == 0 && err == nil {
+				m.CloseFiles()
+				return nil
+			}
+
 			err = m.SaveNewLineToFile(nextLine.NextLine)
 			if err != nil {
 				return err
@@ -59,5 +64,7 @@ func StartClient(port int, filePath string) {
 		log.Fatalf("Failed to save next line to file.\n\t- %s", err.Error())
 		os.Exit(1)
 	}
+
+	os.Exit(0)
 
 }

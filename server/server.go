@@ -28,13 +28,14 @@ func StartServer(protocol string, port int, filePath string) {
 	}
 
 	message.RegisterMessageServiceServer(grpcServer, messageServer)
+
+	messageServer.WaitGroup.Add(1)
+	go messageServer.ReadOriginalFile()
+
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("Failed to server gRPC server over port %d.\n\t- %s", port, err.Error())
 		os.Exit(1)
 	}
-
-	messageServer.WaitGroup.Add(1)
-	go messageServer.ReadOriginalFile()
 
 	messageServer.WaitGroup.Wait()
 

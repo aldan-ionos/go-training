@@ -90,6 +90,6 @@ func (m *Message) GetNextLine(ctx context.Context, line *Line) (*Line, error) {
 		return &Line{NextLine: newLine}, nil
 	}
 
-	return nil, nil
+	return &Line{}, nil
 
 }
