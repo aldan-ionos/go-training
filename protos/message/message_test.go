@@ -38,7 +38,7 @@ func TestMessage(t *testing.T) {
 				// m.CloseFiles()
 				return
 			default:
-				nextLine, err := m.GetNextLine(context.Background(), &message.Line{})
+				nextLine, err := m.GetNextLine(context.Background(), &message.Void{})
 				if err != nil {
 					t.Errorf("Failed to get new line:\n\t- %s", err.Error())
 					return

@@ -84,7 +84,7 @@ func (m *Message) CloseFiles() {
 	m.newFile.Close()
 }
 
-func (m *Message) GetNextLine(ctx context.Context, line *Line) (*Line, error) {
+func (m *Message) GetNextLine(ctx context.Context, _ *Void) (*Line, error) {
 	newLine, ok := <-m.messageChan
 	if ok {
 		return &Line{NextLine: newLine}, nil

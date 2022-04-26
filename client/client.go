@@ -24,7 +24,7 @@ func SaveNewLineToFile(messageClient message.MessageServiceClient, filePath stri
 			m.CloseFiles()
 			return nil
 		default:
-			nextLine, err := messageClient.GetNextLine(context.Background(), &message.Line{})
+			nextLine, err := messageClient.GetNextLine(context.Background(), &message.Void{})
 			if err != nil {
 				return err
 			}
