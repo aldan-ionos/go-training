@@ -1,4 +1,6 @@
 FILENAME=crimeandpunishment.txt
+MESSAGE_DIR=${PWD}/protos/message
+CLIENT_DIR=${PWD}/client
 
 .PHONY: generate-protos
 generate-protos:
@@ -7,25 +9,33 @@ generate-protos:
 
 .PHONY: start-server
 start-server:
-	go run main.go -start-server -protocol=tcp -port=9000 -filepath=${PWD}/protos/message/${FILENAME}
+	go run main.go -start-server -protocol=tcp -port=9000 -filepath=${MESSAGE_DIR}/${FILENAME}
 
 .PHONY: start-client
 start-client:
-	go run main.go -start-client -port=9000 -filepath=${PWD}/client/${FILENAME}
+	go run main.go -start-client -port=9000 -filepath=${CLIENT_DIR}/${FILENAME}
 
 .PHONY: test
 test:
-	cd ${PWD}/protos/message && go test -v .
+	cd ${MESSAGE_DIR} && go test -v .
 
-.PHONY: test-cpu-prof
-test-cpu-prof:
-	cd ${PWD}/protos/message && go test -v -cpuprofile cpu.prof .
+.PHONY: test-cpu-pprof
+test-cpu-pprof:
+	cd ${MESSAGE_DIR} && go test -v -cpuprofile cpu.pprof .
 
-.PHONY: test-mem-prof
-test-mem-prof:
-	cd ${PWD}/protos/message && go test -v -memprofile mem.prof .
+.PHONY: test-mem-pprof
+test-mem-pprof:
+	cd ${MESSAGE_DIR} && go test -v -memprofile mem.pprof .
 
 .PHONY: test-bench
 test-bench:
-	cd ${PWD}/protos/message && go test -v -bench=.
+	cd ${MESSAGE_DIR} && go test -v -bench=.
 
+.PHONY: see-cpu-pprof
+see-cpu-pprof:
+	cd ${MESSAGE_DIR} && go tool pprof -http=:8080 cpu.pprof
+
+
+.PHONY: see-mem-pprof
+see-mem-pprof:
+	cd ${MESSAGE_DIR} && go tool pprof -http=:8081 mem.pprof
